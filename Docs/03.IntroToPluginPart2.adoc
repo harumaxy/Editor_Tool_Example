@@ -1,0 +1,58 @@
+= IntroToPluginPart2
+
+https://www.youtube.com/watch?v=z_eETiQAChg
+
+実際にプラグインを作っていく
+
+== 雛形ディレクトリの作成
+
+実は、手動で作らなくてもテンプレートを作ってくれる
+
+ProjectSettings > Plugin > Create
+
+== エントリーポイント
+
+よくわからないけど、 Project Setting > Plugins で +
+Active にした `EditorPlugin` Node は、
+
+* Activeにした瞬間
+* 既にActiveで、エディターを起動したとき
+
+にエディターのSceneTreeに入る
+
+`_ready()` か `_enter_tree()`をエントリーポイントにすればいい。
+
+
+== _ready()でやること
+
+基本的に、何かしらのイベントに反応して実行されるプラグインにする場合は、 +
+`_ready()`内で `Node.connect()` メソッドで +
+signalにメソッドを登録する。
+
+もしくは、エディター拡張系なら、 +
+Control Node をエディターに追加したり。
+
+どっちにせよ、 `get_editor_interface()` が超便利
+
+
+=== ex. 複数選択ノードを一気にリネームするフォームを表示する
+
+.res://addons/my_plugin/
+* plugin.cfg
+* plugin.gd
+* rename.tscn
+
+プラグインを使うにあたって、表示するUI要素がある場合は、 +
+Pluginディレクトリの中に scene ファイルを含んで良い
+
+[source,gdscript,attributes]
+----
+include::../addons/my_plugin/my_plugin.gd[attributes]
+----
+
+
+.ポイント
+* `_enter_tree()` で `EditorSelection` ノードに、選択したものが変わったときに実行するメソッドをsignalに登録
+* `self.process_input`のbool値を true/false に切り替えて入力を受け付けたり受け付けなかったりする
+* 特定条件下で指定キーの入力があったら、エディターにUIを表示
+** そのUIにもシグナルを登録する
